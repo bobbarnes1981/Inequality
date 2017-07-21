@@ -8,14 +8,14 @@ namespace Inequality
 {
     class Simulation
     {
-        private int m_width = 640;
-        private int m_height = 480;
+        private int m_width = 800;
+        private int m_height = 600;
 
         private Surface m_video;
 
         private Person[] m_people;
 
-        private int m_numberOfPeople = 40;
+        private int m_numberOfPeople = 50;
 
         private int m_startingMoney = 100;
 
@@ -51,7 +51,7 @@ namespace Inequality
 
         public Simulation()
         {
-            m_video = Video.SetVideoMode(640, 480, false, false, false);
+            m_video = Video.SetVideoMode(m_width, m_height, false, false, false);
 
             m_people = new Person[m_numberOfPeople];
 
