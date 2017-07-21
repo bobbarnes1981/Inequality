@@ -43,7 +43,7 @@ namespace Inequality
 
         private int m_maxValue;
 
-        private int m_numberOfGroups = 40;
+        private int m_numberOfGroups = 20;
 
         private int m_sizeOfGroups;
 
@@ -194,6 +194,9 @@ namespace Inequality
                     previousX, previousY,
                     currentX, currentY
                     ), Color.White, false, true);
+
+                m_video.Blit(font.Render(m_groups[groupId].ToString(), Color.White),
+                    new Point(currentX - 6, currentY - 24 - (m_groups[groupId] % 2 == 0 ? 0 : groupScale)));
 
                 previousX = currentX;
                 previousY = currentY;
