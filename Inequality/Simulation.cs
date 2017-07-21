@@ -86,6 +86,8 @@ namespace Inequality
             int width = m_width / m_numberOfPeople;
             int scale = m_height / (m_startingMoney * m_scale);
 
+            SdlDotNet.Graphics.Font font = new SdlDotNet.Graphics.Font("C:\\Windows\\Fonts\\ARIAL.TTF", 12);
+
             // draw bars
 
             for (int i = 0; i < m_numberOfPeople; i++)
@@ -96,6 +98,9 @@ namespace Inequality
                     (short)(width * i), 0,
                     (short)((width * i) + width-1), (short)(scale * m_people[i].Money)),
                     m_people[i].Color, false, true);
+
+                m_video.Blit(font.Render(m_people[i].Money.ToString(), Color.White),
+                    new Point((width * i) + 2, 10));
 
                 // draw peak hold
 
