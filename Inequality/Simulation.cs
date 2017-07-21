@@ -132,7 +132,12 @@ namespace Inequality
 
                     // update groups
 
-                    m_groups[m_people[personId].Money / m_sizeOfGroups] += 1;
+                    int groupId = m_people[personId].Money/m_sizeOfGroups;
+
+                    if (m_groups.Length > groupId)
+                    {
+                        m_groups[groupId] += 1;
+                    }
                 }
             }
 
