@@ -163,23 +163,25 @@ namespace Inequality
         {
             if (m_peakValues[i] <= m_people[i].Money)
             {
-                // push peak to new max
+                // set wait time
                 m_peakDelays[i] = m_peakDelay;
+
+                // push peak to new max
                 m_peakValues[i] = m_people[i].Money;
             }
             else
             {
                 if (m_peakDelays[i] > 0)
                 {
-                    // pause before moving, decrement wait
+                    // pause before moving, decrement wait time
                     m_peakDelays[i] -= 1;
                 }
                 else
                 {
-                    // decrement value
+                    // pause has timed out, decrement value
                     m_peakValues[i] -= 1;
 
-                    // wait
+                    // set new wait time
                     m_peakDelays[i] = m_peakSpeed;
                 }
             }
