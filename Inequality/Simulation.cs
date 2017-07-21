@@ -31,6 +31,14 @@ namespace Inequality
 
         private int m_scale = 4;
 
+        private int m_peakDelay = 5;
+
+        private int m_peakSpeed = 2;
+
+        private int[] m_peakValues;
+
+        private int[] m_peakDelays;
+
         public Simulation()
         {
             m_video = Video.SetVideoMode(640, 480, false, false, false);
@@ -39,12 +47,18 @@ namespace Inequality
 
             m_random = new Random();
 
+            m_peakValues = new int[m_numberOfPeople];
+            m_peakDelays = new int[m_numberOfPeople];
+
             for (int i = 0; i < m_numberOfPeople; i++)
             {
                 int r = m_random.Next(0, 256);
                 int g = m_random.Next(0, 256);
                 int b = m_random.Next(0, 256);
                 m_people[i] = new Person(Color.FromArgb(r,g,b), m_startingMoney);
+
+                m_peakValues[i] = 0;
+                m_peakDelays[i] = 0;
             }
 
             m_elapsed = 0;
@@ -76,10 +90,21 @@ namespace Inequality
 
             for (int i = 0; i < m_numberOfPeople; i++)
             {
+                // draw bar
+
                 m_video.Draw(new Box(
                     (short)(width * i), 0,
                     (short)((width * i) + width-1), (short)(scale * m_people[i].Money)),
                     m_people[i].Color, false, true);
+
+                // draw peak hold
+
+                updatePeak(i);
+
+                m_video.Draw(new Line(
+                    (short)(width * i), (short)(scale * m_peakValues[i]),
+                    (short)((width * i) + width - 1), (short)(scale * m_peakValues[i])
+                    ), Color.White, false, true);
             }
 
             // draw lines
@@ -108,7 +133,7 @@ namespace Inequality
             {
                 Person a = m_people[i];
 
-                Person b = getPerson(i);
+                Person b = getRandomPerson(i);
 
                 a.Money += 1;
                 b.Money -= 1;
@@ -117,7 +142,33 @@ namespace Inequality
             Video.WindowCaption = string.Format("Cycles: {0}", m_cycles);
         }
 
-        private Person getPerson(int not)
+        private void updatePeak(int person)
+        {
+            if (m_peakValues[person] <= m_people[person].Money)
+            {
+                // push peak to new max
+                m_peakDelays[person] = m_peakDelay;
+                m_peakValues[person] = m_people[person].Money;
+            }
+            else
+            {
+                if (m_peakDelays[person] > 0)
+                {
+                    // pause before moving, decrement wait
+                    m_peakDelays[person] -= 1;
+                }
+                else
+                {
+                    // decrement value
+                    m_peakValues[person] -= 1;
+
+                    // wait
+                    m_peakDelays[person] = m_peakSpeed;
+                }
+            }
+        }
+
+        private Person getRandomPerson(int not)
         {
             int selectedId = not;
             do
