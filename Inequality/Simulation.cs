@@ -39,6 +39,8 @@ namespace Inequality
 
         private int[] m_peakDelays;
 
+        private bool m_allowNegativeMoney = false;
+
         public Simulation()
         {
             m_video = Video.SetVideoMode(640, 480, false, false, false);
@@ -81,6 +83,19 @@ namespace Inequality
                 // simulate
 
                 simulate();
+
+                // do updates after all simulation is complete
+
+                for (int i = 0; i < m_numberOfPeople; i++)
+                {
+                    // update peaks
+
+                    updatePeak(i);
+
+                    // update history for person
+
+                    m_history.Push(i, m_people[i].Money);
+                }
             }
 
             int width = m_width / m_numberOfPeople;
@@ -99,25 +114,19 @@ namespace Inequality
                     (short)((width * i) + width-1), (short)(scale * m_people[i].Money)),
                     m_people[i].Color, false, true);
 
+                // draw value
+
                 m_video.Blit(font.Render(m_people[i].Money.ToString(), Color.White),
                     new Point((width * i) + 2, 10));
 
                 // draw peak hold
 
-                updatePeak(i);
-
                 m_video.Draw(new Line(
                     (short)(width * i), (short)(scale * m_peakValues[i]),
                     (short)((width * i) + width - 1), (short)(scale * m_peakValues[i])
                     ), Color.White, false, true);
-            }
 
-            // draw lines
-
-            for (int i = 0; i < m_numberOfPeople; i++)
-            {
-                // update history for person
-                m_history.Push(i, m_people[i].Money);
+                // draw lines
 
                 for (int j = 0; j < m_width; j++)
                 {
@@ -138,37 +147,40 @@ namespace Inequality
             {
                 Person a = m_people[i];
 
-                Person b = getRandomPerson(i);
+                if (a.Money > 0 || m_allowNegativeMoney)
+                {
+                    Person b = getRandomPerson(i);
 
-                a.Money += 1;
-                b.Money -= 1;
+                    a.Money -= 1;
+                    b.Money += 1;
+                }
             }
 
             Video.WindowCaption = string.Format("Cycles: {0}", m_cycles);
         }
 
-        private void updatePeak(int person)
+        private void updatePeak(int i)
         {
-            if (m_peakValues[person] <= m_people[person].Money)
+            if (m_peakValues[i] <= m_people[i].Money)
             {
                 // push peak to new max
-                m_peakDelays[person] = m_peakDelay;
-                m_peakValues[person] = m_people[person].Money;
+                m_peakDelays[i] = m_peakDelay;
+                m_peakValues[i] = m_people[i].Money;
             }
             else
             {
-                if (m_peakDelays[person] > 0)
+                if (m_peakDelays[i] > 0)
                 {
                     // pause before moving, decrement wait
-                    m_peakDelays[person] -= 1;
+                    m_peakDelays[i] -= 1;
                 }
                 else
                 {
                     // decrement value
-                    m_peakValues[person] -= 1;
+                    m_peakValues[i] -= 1;
 
                     // wait
-                    m_peakDelays[person] = m_peakSpeed;
+                    m_peakDelays[i] = m_peakSpeed;
                 }
             }
         }
